@@ -7,7 +7,6 @@ module "dynamodb_lock" {
   }
 }
 
-
 module "iam_policy" {
   source         = "../../modules/iam_policy"
   s3_bucket      = "darpg-tfstate-bucket"
@@ -17,31 +16,27 @@ module "iam_policy" {
 }
 
 resource "aws_iam_user_policy_attachment" "attach" {
-  user       = "ankur"  # or your IAM user
+  user       = "ankur"
   policy_arn = module.iam_policy.tf_backend_access_arn
+  depends_on = [module.iam_policy]
 }
-
 
 module "s3_tfstate" {
-  source         = "../../modules/s3"
-  bucket_name    = var.bucket_name
-  tags           = var.tags
+  source                   = "../../modules/s3"
+  bucket_name              = var.bucket_name
+  tags                     = var.tags
   terraform_backend_role_arn = "arn:aws:iam::888184096450:user/ankur"
-  bucket_policy  = jsonencode(var.bucket_policy) # move function here
+  bucket_policy            = jsonencode(var.bucket_policy)
 }
 
-
-# root main.tf
 module "vpc" {
-  source = "../../modules/vpc"
-
-  aws_region             = var.aws_region
-  vpc_config             = var.vpc_config
-  internet_gateway_tags  = var.internet_gateway_tags
-  public_subnets         = var.public_subnets
-  route_table_tags       = var.route_table_tags
+  source                 = "../../modules/vpc"
+  aws_region            = var.aws_region
+  vpc_config            = var.vpc_config
+  internet_gateway_tags = var.internet_gateway_tags
+  public_subnets        = var.public_subnets
+  route_table_tags      = var.route_table_tags
 }
-
 
 module "security_group" {
   source         = "../../modules/sg"
@@ -49,11 +44,10 @@ module "security_group" {
   sg_description = var.sg_description
   vpc_id         = module.vpc.vpc_id
   tags           = var.sg_tags
-
-  ingress_rules = var.ingress_rules
-  egress_rules  = var.egress_rules
+  ingress_rules  = var.ingress_rules
+  egress_rules   = var.egress_rules
+  depends_on     = [module.vpc]
 }
-
 
 module "key_pair" {
   source      = "../../modules/key_pair"
@@ -62,8 +56,13 @@ module "key_pair" {
   bucket_name = "darpg-tfstate-bucket"
 }
 
-
 module "ec2_instances" {
-  source   = "../../modules/ec2"
+  source    = "../../modules/ec2"
   instances = var.instances
+
+  depends_on = [
+    module.vpc,
+    module.security_group,
+    module.key_pair
+  ]
 }

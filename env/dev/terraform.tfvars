@@ -126,12 +126,38 @@ instances = {
   ec2_1 = {
     ami                         = "ami-0f5ee92e2d63afc18"
     instance_type               = "t2.micro"
-    subnet_name                 = "darpg-public-subnet-1"   # <-- required
-    sg_name                     = "darpg-sg"                # <-- required
+    subnet_name                 = "darpg-public-subnet-1"
+    sg_name                     = "darpg-sg"
     associate_public_ip_address = true
     key_name                    = "darpg-key"
     tags = {
       Name        = "darpg-ec2-1"
+      Environment = "dev"
+    }
+  }
+
+  ec2_2 = {
+    ami                         = "ami-0f5ee92e2d63afc18"
+    instance_type               = "t2.micro"
+    subnet_name                 = "darpg-public-subnet-2"
+    sg_name                     = "darpg-sg"
+    associate_public_ip_address = true
+    key_name                    = "darpg-key"
+    tags = {
+      Name        = "darpg-ec2-2"
+      Environment = "dev"
+    }
+  }
+
+  ec2_3 = {
+    ami                         = "ami-0f5ee92e2d63afc18"
+    instance_type               = "t2.micro"
+    subnet_name                 = "darpg-public-subnet-1"
+    sg_name                     = "darpg-sg"
+    associate_public_ip_address = true
+    key_name                    = "darpg-key"
+    tags = {
+      Name        = "darpg-ec2-3"
       Environment = "dev"
     }
   }
